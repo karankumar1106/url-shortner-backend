@@ -4,7 +4,7 @@ import { DB_NAME } from "../constants.js";
 const connectDB = async () => {
   try {
     const connectionInstance = await mongoose.connect(
-      `${process.env.MONGODB_URI}/${DB_NAME}?ssl=true&replicaSet=atlas-2syrph-shard-0&authSource=admin&appName=Cluster0`,
+      `${process.env.MONGODB_URI}`,
     );
     console.log("MONGODB connected successfully !!");
   } catch (error) {

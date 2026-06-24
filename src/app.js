@@ -28,7 +28,9 @@ app.use(
 app.use(errorHandler);
 
 import healthCheckRouter from "./routes/healthcheck.routes.js";
+import urlRouter from "./routes/url.routes.js"
 // router declaration
 app.use("/api/v1/healthcheck", healthCheckRouter);
+app.use("/api/v1/urls",urlRouter)
 
 export { app };
