@@ -6,7 +6,7 @@ import { generateShortCode } from "../utils/generateShortCode.js";
 
 const createShortUrl = asyncHandler(async (req, res) => {
   const { originalUrl } = req.body;
-
+  
   if (!originalUrl) {
     throw new ApiError(400, "original Url is required");
   }
@@ -29,4 +29,23 @@ const createShortUrl = asyncHandler(async (req, res) => {
     );
 });
 
-export { createShortUrl };
+const redirectToOriginalUrl = asyncHandler(async (req, res) => {
+  const { shortCode } = req.params;
+
+  const url = await Url.findOneAndUpdate(
+    { shortCode },
+    {
+      $inc: {
+        clicks: 1,
+      },
+    },
+    {
+      returnDocument: "after",
+    },
+  );
+  if(!url){
+    throw new ApiError(404,"short url no found")
+  }
+  return res.redirect(url.originalUrl);
+});
+export { createShortUrl, redirectToOriginalUrl };

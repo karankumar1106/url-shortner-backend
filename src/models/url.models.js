@@ -6,11 +6,13 @@ const urlSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      index:true
     },
     shortCode: {
       type: String,
       required: true,
       unique: true,
+      index:true,
       default: () => {
         nanoid(6);
       },
