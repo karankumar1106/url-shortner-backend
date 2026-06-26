@@ -101,26 +101,26 @@ const getMyUrls = asyncHandler(async (req, res) => {
 
 const deactivateUrl = asyncHandler(async (req, res) => {
   const { shortCode } = req.params;
-  const url = await Url.findOneAndUpdate(
-    { shortCode, createdBy: req.user?._id },
-    {
-      $set:{
-        isActive:false
-      }
-    },
-    {
-      returnDocument: "after",
-    },
-  );
-
+  const url = await Url.findOne({
+    shortCode,
+    createdBy: req.user._id,
+  });
   if (!url) {
     throw new ApiError(404, "Url not found");
   }
+  if (!url.isActive) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Url is already deactivated"));
+  }
+
+  url.isActive = false;
+  await url.save();
 
   return res
-  .status(200)
-  .json(new ApiResponse(200, {}, "Url deleted successfully"))
-})
+    .status(200)
+    .json(new ApiResponse(200, {}, "Url deleted successfully"));
+});
 export {
   createShortUrl,
   redirectToOriginalUrl,
