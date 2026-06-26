@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken"
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { userName, email, fullName, password } = req.body;
@@ -17,14 +18,19 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (existingUser) {
-    throw new ApiError(409, "User already exist");
+    throw new ApiError(409, "User with this email or username already exist");
   }
+
+  const profileImageLocalPath=req.file?.path
+  const profileImage=profileImageLocalPath ? await uploadOnCloudinary(profileImageLocalPath,"url-shortener/profile-images"):null
 
   const user = await User.create({
     userName:userName,
     email,
     fullName,
     password,
+    profileImage:profileImage.secure_url,
+    profileImagePublicId:profileImage.public_id
   });
 
   const createdUser = await User.findById(user._id).select(
