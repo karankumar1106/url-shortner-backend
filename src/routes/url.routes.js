@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createShortUrl,getUrlStats,getMyUrls,deactivateUrl } from "../controllers/url.controllers.js";
+import { createShortUrl,getUrlStats,getMyUrls,deactivateUrl} from "../controllers/url.controllers.js";
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 
 const router=Router()

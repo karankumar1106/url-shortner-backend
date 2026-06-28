@@ -224,7 +224,80 @@ const updateprofileImage = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, updateduser, "profile image updated successfully"));
+    .json(
+      new ApiResponse(200, updateduser, "profile image updated successfully"),
+    );
+});
+
+const updateProfile = asyncHandler(async (req, res) => {
+  const { email, fullName } = req.body;
+
+  if (!email && !fullName) {
+    throw new ApiError(400, "Provide at least one field to update");
+  }
+
+  if (email) {
+    const existingUser = await User.findOne({
+      email,
+      _id: { $ne: req.user._id }, // Exclude the current user
+    });
+
+    if (existingUser) {
+      throw new ApiError(409, "Email already exists");
+    }
+  }
+
+  const updateFields = {};
+
+  if (email) {
+    updateFields.email = email;
+  }
+
+  if (fullName) {
+    updateFields.fullName = fullName;
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: updateFields,
+    },
+    {
+      returnDocument: "after",
+    },
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Profile updated successfully"));
+});
+
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    throw new ApiError(400, "All fields are required");
+  }
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(400, "New password and confirm password do not match");
+  }
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(currentPassword);
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Current password is incorrect");
+  }
+
+  user.password = newPassword;
+  await user.save({
+    validateBeforeSave: false,
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 export {
   registerUser,
@@ -232,5 +305,7 @@ export {
   logoutUser,
   getCurrentUser,
   refreshAccessToken,
-  updateprofileImage
+  updateprofileImage,
+  updateProfile,
+  changeCurrentPassword
 };
