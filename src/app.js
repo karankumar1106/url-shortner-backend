@@ -31,10 +31,14 @@ import healthCheckRouter from "./routes/healthcheck.routes.js";
 import urlRouter from "./routes/url.routes.js"
 import redirectToOriginalUrlRouter from "./routes/redirect.routes.js"
 import userRouter from "./routes/user.routes.js"
+import dashboardRouter from "./routes/dashboard.routes.js"
+import analyticsRouter from "./routes/analytics.routes.js"
 // router declaration
 app.use("/api/v1/healthcheck", healthCheckRouter);
 app.use("/api/v1/urls",urlRouter)
 app.use("/",redirectToOriginalUrlRouter)
 app.use("/api/v1/users",userRouter)
+app.use("/api/v1/dashboard",dashboardRouter)
+app.use("/api/v1/analytics",analyticsRouter)
 
 export { app };

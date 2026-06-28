@@ -5,6 +5,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { generateShortCode } from "../utils/generateShortCode.js";
 import { isValidUrl } from "../utils/isValidUrl.js";
 
+import { Analytics } from "../models/analytics.models.js";
+import { UAParser } from "ua-parser-js";
+
 const createShortUrl = asyncHandler(async (req, res) => {
   const { originalUrl } = req.body;
 
@@ -52,7 +55,27 @@ const redirectToOriginalUrl = asyncHandler(async (req, res) => {
   if (!url) {
     throw new ApiError(404, "short url no found or inactive");
   }
-  return res.redirect(url.originalUrl);
+
+  // analytics features
+
+  const userAgent=req.get("User-Agent")
+  const parser=new UAParser(userAgent)
+  // testing
+  // console.log(parser.getResult())
+  
+  const uaResult=parser.getResult()
+
+  // alalytics creation
+  await Analytics.create({
+    url:url._id,
+    clickedByIp:req.ip,
+    userAgent,
+    referrer:req.get("Referer"),
+    browser:uaResult.browser.name,
+    os:uaResult.os.name,
+    device:uaResult.device.type,
+  })
+  return res.redirect(302,url.originalUrl);
 });
 
 const getUrlStats = asyncHandler(async (req, res) => {
