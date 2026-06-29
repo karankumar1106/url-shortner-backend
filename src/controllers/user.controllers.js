@@ -38,8 +38,8 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     fullName,
     password,
-    profileImage: profileImage.secure_url,
-    profileImagePublicId: profileImage.public_id,
+    profileImage: profileImage?.secure_url || null,
+    profileImagePublicId: profileImage?.public_id || null,
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -75,7 +75,7 @@ const loginUser = asyncHandler(async (req, res) => {
   //testing
   // console.log(password);
   // console.log(user);
-  
+
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid credentials");
@@ -308,5 +308,5 @@ export {
   refreshAccessToken,
   updateprofileImage,
   updateProfile,
-  changeCurrentPassword
+  changeCurrentPassword,
 };

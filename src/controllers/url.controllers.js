@@ -20,7 +20,6 @@ const createShortUrl = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid URL format");
   }
 
-  // const shortCode = generateShortCode();
   let shortCode;
   let isCustomAlias = false;
   if (customCode) {
