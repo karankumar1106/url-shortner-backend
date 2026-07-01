@@ -7,7 +7,6 @@ import rateLimit from "express-rate-limit";
 
 const app = express();
 
-// hemlet and rate limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 10,

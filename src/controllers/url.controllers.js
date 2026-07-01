@@ -41,7 +41,6 @@ const createShortUrl = asyncHandler(async (req, res) => {
     shortCode = generateShortCode();
   }
 
-  //expiry date
 
   let expiryDate = null;
   if (expiresAt) {
@@ -77,9 +76,9 @@ const createShortUrl = asyncHandler(async (req, res) => {
 const redirectToOriginalUrl = asyncHandler(async (req, res) => {
   const { shortCode } = req.params;
 
-  // caching redirected urls for performance improvement
   const cachedUrl = await redisClient.get(`url:${shortCode}`);
 
+  // Check Redis before querying MongoDB (Cache-Aside Pattern)
   if (cachedUrl) {
     const urlData = JSON.parse(cachedUrl);
     if (urlData.expiresAt && new Date(urlData.expiresAt) <= new Date()) {
@@ -127,16 +126,13 @@ const redirectToOriginalUrl = asyncHandler(async (req, res) => {
     );
 
     await Url.updateOne({ shortCode }, { $inc: { clicks: 1 } });
-    // analytics features
+
 
     const userAgent = req.get("User-Agent");
     const parser = new UAParser(userAgent);
-    // testing
-    // console.log(parser.getResult())
 
     const uaResult = parser.getResult();
 
-    // alalytics creation
     await Analytics.create({
       url: url._id,
       clickedByIp: req.ip,
@@ -215,11 +211,12 @@ const deactivateUrl = asyncHandler(async (req, res) => {
   url.isActive = false;
   await url.save();
 
+  // deleting from redis cache if exists, so that next time it will not be redirected
   await redisClient.del(`url:${shortCode}`);
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Url deleted successfully"));
+    .json(new ApiResponse(200, {}, "Url deactivated successfully"));
 });
 export {
   createShortUrl,

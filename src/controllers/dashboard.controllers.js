@@ -60,11 +60,6 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     },
   ]);
 
-  //testing
-//   console.log(stats)
-// console.log(stats[0].summary[0])
-// console.log(stats[0].topUrl[0])
-
   const summary = stats[0]?.summary[0] || {
     totalUrls: 0,
     totalClicks: 0,

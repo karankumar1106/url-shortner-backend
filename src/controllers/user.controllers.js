@@ -48,7 +48,7 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken",
   );
 
-  // if deleted after creation
+  // if deleted after creation, throw error
   if (!createdUser) {
     throw new ApiError(500, "Failed to create user");
   }
@@ -74,9 +74,6 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(404, "user not found");
   }
-  //testing
-  // console.log(password);
-  // console.log(user);
 
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {

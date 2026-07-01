@@ -5,10 +5,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Url } from "../models/url.models.js";
 
 const getUrlAnalytics = asyncHandler(async (req, res) => {
-  //testing
-  // console.log(req.query);
-  // console.log(req.params);
-  // console.log(req.query.page)
 
   const { shortCode } = req.params;
   const page = Number(req.query.page) || 1;
