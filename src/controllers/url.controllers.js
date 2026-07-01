@@ -10,6 +10,7 @@ import { Analytics } from "../models/analytics.models.js";
 import { UAParser } from "ua-parser-js";
 
 import redisClient from "../config/redis.js";
+import {getLocation} from "../utils/getLocation.js";
 
 const createShortUrl = asyncHandler(async (req, res) => {
   const { originalUrl, customCode, expiresAt } = req.body;
@@ -87,9 +88,11 @@ const redirectToOriginalUrl = asyncHandler(async (req, res) => {
 
     await Url.updateOne({ shortCode }, { $inc: { clicks: 1 } });
 
+    const {country, city} = await getLocation(req.ip);
     const userAgent = req.get("User-Agent");
     const parser = new UAParser(userAgent);
     const uaResult = parser.getResult();
+
     await Analytics.create({
       url: urlData._id,
       clickedByIp: req.ip,
@@ -97,6 +100,8 @@ const redirectToOriginalUrl = asyncHandler(async (req, res) => {
       referrer: req.get("Referer"),
       browser: uaResult.browser.name,
       os: uaResult.os.name,
+      country,
+      city,
       device: uaResult.device.type,
     });
     console.log("Redirecting to original URL:", urlData.originalUrl);
@@ -127,7 +132,7 @@ const redirectToOriginalUrl = asyncHandler(async (req, res) => {
 
     await Url.updateOne({ shortCode }, { $inc: { clicks: 1 } });
 
-
+    const {country, city} = await getLocation(req.ip);
     const userAgent = req.get("User-Agent");
     const parser = new UAParser(userAgent);
 
@@ -139,6 +144,8 @@ const redirectToOriginalUrl = asyncHandler(async (req, res) => {
       userAgent,
       referrer: req.get("Referer"),
       browser: uaResult.browser.name,
+      country,
+      city,
       os: uaResult.os.name,
       device: uaResult.device.type,
     });
