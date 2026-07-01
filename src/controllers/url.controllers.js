@@ -215,6 +215,8 @@ const deactivateUrl = asyncHandler(async (req, res) => {
   url.isActive = false;
   await url.save();
 
+  await redisClient.del(`url:${shortCode}`);
+
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "Url deleted successfully"));
