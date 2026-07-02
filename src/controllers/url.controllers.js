@@ -105,7 +105,6 @@ const redirectToOriginalUrl = asyncHandler(async (req, res) => {
       city,
       device: uaResult.device.type,
     });
-    console.log("Redirecting to original URL:", urlData.originalUrl);
     return res.redirect(302, urlData.originalUrl);
   } else {
     const url = await Url.findOne({ shortCode, isActive: true });

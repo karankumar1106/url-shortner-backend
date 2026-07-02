@@ -19,7 +19,6 @@ export const getLocation = async (ip) => {
       };
     }
 
-    console.log(`response:`, response);
     const data = await response.json();
 
     return {
