@@ -4,3 +4,4 @@ node_modules
 .gitignore
 README.md
 npm-debug.log
+.env.compose
